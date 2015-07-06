@@ -121,7 +121,7 @@ object unconvert extends App {
         }
         case p: PCData => print("〈![CDATA[" + p.data + "]]〉")
         case r: EntityRef => print("〈&" + r.entityName + "〉") 
-        case c: Comment => print("〈!--" + c.commentText + "--〉")
+        case c: Comment => print("〈!--" + c.commentText.replace("&#45", "-") + "--〉")
         case i: ProcInstr => print("〈?" + i.target + " " + i.proctext + "?〉")
         case a: Atom[_] => print(a.text) // For < > 
         case _ => print("〈!-- unexpected " + n.text + " --〉")

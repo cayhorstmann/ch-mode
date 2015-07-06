@@ -105,7 +105,8 @@ object convert extends App {
                     endOfComment = 3 
                   }
                   else { 
-                    error("-- in comment")
+                    print("&#45") // Can't have -- in comments
+                    endOfComment = 0
                   }
                 } else { 
                     print(iter.next)
