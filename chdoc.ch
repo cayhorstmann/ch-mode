@@ -46,6 +46,11 @@
         〈pre
 〈&#9001〉pre
 x=1〈&#9002〉〉〉
+      〈li In an 〈 a〉 element with a 〈 href〉 and no contents, the 〈 href〉 attribute value becomes the contents. For example,
+        〈pre
+〈&#9001〉a href='http://horstmann.com'〈&#9002〉〉becomes
+        〈pre
+<a href='http://horstmann.com'>http://horstmann.com</a>〉〉
       〈li If the 〈 〈&#9001〉〉 is followed by a 〈 !〉 or 〈 ?〉, everything until the matching 〈 〈&#9002〉〉 is copied verbatim, and surrounded by 〈 < >〉. This lets you include processing instructions, comments, and doctypes. For example, the top of your document can start out as 
         〈pre
 〈&#9001〉?xml version='1.0' encoding='UTF-8'?〈&#9002〉

@@ -269,6 +269,15 @@
     (insert "    〉\n")
     (goto-char pos)))
 
+(defun ch-insert-doc ()
+  (interactive)
+  (let (pos)
+    (beginning-of-buffer)
+    (insert "〈html xmlns='http://www.w3.org/1999/xhtml'\n  〈head\n    〈meta http-equiv=content-type content='text/html; charset=utf-8'〉\n    〈title ")
+    (setq pos (point))
+    (insert "〉\n  〉\n  〈body\n  〉\n〉\n")
+    (goto-char pos)))
+
 (defun ch-insert-ref (to id)
   (interactive "sTo element: \nsID: \n")
   (insert (concat "〈a." to "ref href='#" id "'〉")))
@@ -276,7 +285,7 @@
 (defun ch-show-browser ()
   "Show buffer in browser"
   (interactive)
-  (browse-url-generic (shell-quote-argument (replace-regexp-in-string "[.]ch" ".html" buffer-file-name))))
+  (browse-url-generic (concat "file://" (shell-quote-argument (replace-regexp-in-string "[.]ch" ".html" buffer-file-name)))))
 
 (fset 'ch-pre
    [return ?〈 ?p ?r ?e ?  return home ?〉 left])
@@ -303,6 +312,7 @@
   (define-key ch-mode-map (kbd "C-h C-t") 'ch-insert-table)
   (define-key ch-mode-map (kbd "C-h C-r") 'ch-insert-ref)
   (define-key ch-mode-map (kbd "C-h C-i") 'ch-insert-id)
+  (define-key ch-mode-map (kbd "C-h C-d") 'ch-insert-doc-browser)
   (define-key ch-mode-map (kbd "C-h C-b") 'ch-show-browser)
 )
 
@@ -351,6 +361,28 @@
             (variable-pitch-mode t)
             (local-set-key (kbd "RET") 'font-lock-and-indent)
             ))
+
+(defun ch-find-file-hook ()
+  "When finding a ch file, make sure there isn't a newer HTML file"
+  (flet ((file-time 
+          (filename) 
+          (string-to-number 
+           (format-time-string 
+            "%s" 
+            (nth 5 (file-attributes filename))))))
+    (if (and buffer-file-name
+             (string-match "\.ch$" buffer-file-name))
+        (let* ((mtime-ch (nth 5 (file-attributes (buffer-file-name))))
+               (htmlfile (replace-regexp-in-string "\.ch$" ".html" buffer-file-name)))
+          (if (and (file-exists-p htmlfile)            
+                   (< (+ 1 (file-time (buffer-file-name)))
+                      (file-time htmlfile)))
+              (progn
+                (toggle-read-only 1)
+                (message (concat "Caution: " htmlfile " is newer than " (buffer-file-name))))
+            )))))
+(add-hook 'find-file-hook 'ch-find-file-hook)
+
 
 (defun ch-after-save-hook ()
   "After saving a ch file, run the ch script"

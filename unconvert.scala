@@ -17,13 +17,15 @@ object unconvert extends App {
     "span", "strong", "sub", "sup", "textarea", "tt", "var")
   // "ins", "del" can be either
 
+  var first = true
+
   // println("〈?xml version='1.0' encoding='UTF-8'?〉")
   if (dtd != null && dtd.externalID != null)
     println("〈!DOCTYPE html " + dtd.externalID + "〉")
   write(root.asInstanceOf[Elem], 0)
 
   def writeIndent(indent: Int) {
-    println()
+    if (first) first = false else println()
     for (i <- 1 to tabs * indent) print(" ")
   }
 
@@ -61,7 +63,6 @@ object unconvert extends App {
 
   def write(e: Elem, indent: Int) {
     val label = if (e.prefix == null) e.label else e.prefix + ":" + e.label
-    if (label == "h1") println();
     val isInline = inlineElements.contains(label)
     if (!isInline) writeIndent(indent)
 

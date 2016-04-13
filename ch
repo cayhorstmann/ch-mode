@@ -8,8 +8,7 @@ if [ -z $SCALA_HOME ] ; then
   export SCALA_HOME=/opt/scala
 fi
 
-#CLASSPATH=/data/cay/projects/ch
-CLASSPATH=`dirname $0`/ch.jar
+CLASSPATH=`readlink -f $0`.jar # ch.jar
 
 if [[ "$1" = "-f" ]] ; then
     FORCE=t
