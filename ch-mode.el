@@ -362,27 +362,26 @@
             (local-set-key (kbd "RET") 'font-lock-and-indent)
             ))
 
+(defun ch-file-time (filename) 
+  (string-to-number 
+   (format-time-string 
+    "%s" 
+    (nth 5 (file-attributes filename)))))
+
 (defun ch-find-file-hook ()
   "When finding a ch file, make sure there isn't a newer HTML file"
-  (flet ((file-time 
-          (filename) 
-          (string-to-number 
-           (format-time-string 
-            "%s" 
-            (nth 5 (file-attributes filename))))))
-    (if (and buffer-file-name
-             (string-match "\.ch$" buffer-file-name))
-        (let* ((mtime-ch (nth 5 (file-attributes (buffer-file-name))))
-               (htmlfile (replace-regexp-in-string "\.ch$" ".html" buffer-file-name)))
-          (if (and (file-exists-p htmlfile)            
-                   (< (+ 1 (file-time (buffer-file-name)))
-                      (file-time htmlfile)))
-              (progn
-                (toggle-read-only 1)
-                (message (concat "Caution: " htmlfile " is newer than " (buffer-file-name))))
-            )))))
+  (if (and buffer-file-name
+           (string-match "\.ch$" buffer-file-name))
+      (let* ((mtime-ch (nth 5 (file-attributes (buffer-file-name))))
+             (htmlfile (replace-regexp-in-string "\.ch$" ".html" buffer-file-name)))
+        (if (and (file-exists-p htmlfile)            
+                 (< (+ 1 (ch-file-time (buffer-file-name)))
+                    (ch-file-time htmlfile)))
+            (progn
+              (toggle-read-only 1)
+              (message (concat "Caution: " htmlfile " is newer than " (buffer-file-name))))
+          ))))
 (add-hook 'find-file-hook 'ch-find-file-hook)
-
 
 (defun ch-after-save-hook ()
   "After saving a ch file, run the ch script"
