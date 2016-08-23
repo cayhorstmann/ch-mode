@@ -46,7 +46,7 @@
         〈pre
 〈&#9001〉pre
 x=1〈&#9002〉〉〉
-      〈li In an 〈 a〉 element with a 〈 href〉 and no contents, the 〈 href〉 attribute value becomes the contents. For example,
+      〈li If an 〈 a〉 element has an 〈 href〉 value that doesn't start with a 〈 #〉, has no other attribute, and has no contents, the 〈 href〉 attribute value becomes the contents. For example,
         〈pre
 〈&#9001〉a href='http://horstmann.com'〈&#9002〉〉becomes
         〈pre

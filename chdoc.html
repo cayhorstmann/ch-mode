@@ -44,7 +44,7 @@
         <pre>&#9001;code  x=1&#9002;</pre> or 
         <pre>&#9001;pre
 x=1&#9002;</pre></li>
-      <li>In an <code>a</code> element with a <code>href</code> and no contents, the <code>href</code> attribute value becomes the contents. For example,
+      <li>If an <code>a</code> element has an <code>href</code> value that doesn't start with a <code>#</code>, has no other attribute, and has no contents, the <code>href</code> attribute value becomes the contents. For example,
         <pre>&#9001;a href='http://horstmann.com'&#9002;</pre>becomes
         <pre>&lt;a href='http://horstmann.com'&gt;http://horstmann.com&lt;/a&gt;</pre></li>
       <li>If the <code>&#9001;</code> is followed by a <code>!</code> or <code>?</code>, everything until the matching <code>&#9002;</code> is copied verbatim, and surrounded by <code>&lt; &gt;</code>. This lets you include processing instructions, comments, and doctypes. For example, the top of your document can start out as 
