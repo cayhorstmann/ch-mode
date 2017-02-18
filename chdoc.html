@@ -82,6 +82,13 @@ x=1&#9002;</pre></li>
       </li> 
       <li>How do you match the brackets? Emacs will match any kind of Unicode brackets, and if your text editor is any good, it will do the same.</li> 
     </ul> 
-    <p>So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.</p> 
+    <p>So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.</p>
+    <p>You can download the source of the converter from <a href='https://bitbucket.org/cayhorstmann/ch-mode'>https://bitbucket.org/cayhorstmann/ch-mode</a>. Installation instructions are in <code>ch-mode.el</code>.</p>
+    <p>If you just want the converter and not the Emacs mode, then simply make a JAR file by running</p>
+      <pre>scalac *.scala
+jar cvf ch.jar *.class
+    rm *.class</pre>
+  <p>You need Scala version 2.10 or later, which needs Java 7 or later.</p>
+  <p>Move the ch script and ch.jar to ~/bin or another location on your PATH. If you don't have <code>JAVA_HOME</code> and <code>SCALA_HOME</code> set, edit the ch script to set them.</p>
   </body> 
 </html>

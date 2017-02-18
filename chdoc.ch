@@ -92,6 +92,14 @@ include "%L"
       〉 
       〈li How do you match the brackets? Emacs will match any kind of Unicode brackets, and if your text editor is any good, it will do the same.〉 
     〉 
-    〈p So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.〉 
+    〈p So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.〉
+    〈p You can download the source of the converter from 〈a href=https://bitbucket.org/cayhorstmann/ch-mode〉. Installation instructions are in 〈 ch-mode.el〉.〉
+    〈p If you just want the converter and not the Emacs mode, then simply make a JAR file by running〉
+      〈pre
+scalac *.scala
+jar cvf ch.jar *.class
+    rm *.class〉
+  〈p You need Scala version 2.10 or later, which needs Java 7 or later.〉
+  〈p Move the ch script and ch.jar to ~/bin or another location on your PATH. If you don't have 〈 JAVA_HOME〉 and 〈 SCALA_HOME〉 set, edit the ch script to set them.〉
   〉 
 〉

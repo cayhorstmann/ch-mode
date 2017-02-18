@@ -19,15 +19,22 @@
 ;; Installation:
 ;;
 ;; Save this file as ch-mode.el, byte compile it and put the
-;; resulting redo.elc file in a directory that is listed in
+;; resulting ch.elc file in a directory ch-mode that is listed in
 ;; load-path, and load it. For example,
 
-;; (add-to-list 'load-path (expand-file-name "/path/to/ch"))
+;; (add-to-list 'load-path (expand-file-name "/path/to/ch-mode"))
 ;; (load "ch-mode")
 
-;; Put the files ch and ch.jar somewhere (such as ~/bin).
-;; You need Scala version 2.10 or later, which needs Java 7 or later. 
-;; If you don't have JAVA_HOME and SCALA_HOME set, edit the ch script
+;; You need Scala version 2.10 or later, which needs Java 7 or later.
+;; Make a JAR file by running
+;;     scalac *.scala
+;;     jar cvf ch.jar *.class
+;;     rm *.class
+
+;; Then move the ch script and ch.jar to ~/bin or another location
+;; of your choice. If you don't have JAVA_HOME and SCALA_HOME set,
+;; edit the ch script to set them.
+
 ;; Set the path to the ch command in the ch group (default ~/bin/ch)
 
 ;; You can change the font faces in the ch-faces group
@@ -375,7 +382,7 @@
       (let* ((mtime-ch (nth 5 (file-attributes (buffer-file-name))))
              (htmlfile (replace-regexp-in-string "\.ch$" ".html" buffer-file-name)))
         (if (and (file-exists-p htmlfile)            
-                 (< (+ 1 (ch-file-time (buffer-file-name)))
+                 (< (+ 2 (ch-file-time (buffer-file-name)))
                     (ch-file-time htmlfile)))
             (progn
               (toggle-read-only 1)
