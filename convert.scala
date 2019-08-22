@@ -10,9 +10,9 @@ object convert extends App {
 
   val elements = Set(
 "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "data", "datalist", "dd", "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "menu", "menuitem", "meta", "meter", "nav", "nobr", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp"
-, "math", "mi", "mo", "mn", "mrow", "mtable", "mtr", "mtd", "mfrac", "msup", "maction", "menclose", "mfenced", "mglyph", "mover", "mroot", "ms", "msqrt", "msub", "msubsup", "mtable", "mtext", "munder", "mover", "munderover", "mstyle"
-)
-
+, "math", "mi", "mo", "mn", "mrow", "mtable", "mtr", "mtd", "mfrac", "msup", "maction", "menclose", "mfenced", "mglyph", "mover", "mroot", "ms", "msqrt", "msub", "msubsup", "mtable", "mtext", "munder", "mover", "munderover", "mstyle", "svg"
+  )
+  var xmlMode = false
 
   def error(msg: String) {    
     System.err.println(line + ": " + msg) 
@@ -81,6 +81,13 @@ object convert extends App {
     b.toString
   }
 
+  def altFromSrc(src: String) = {
+    val n1 = src.lastIndexOf("/")
+    val n2 = src.lastIndexOf(".")
+    if (n2 >= 0) src.substring(n1 + 1, n2) else src.substring(n1 + 1)
+  }
+
+  if (args.length > 0 && args(0) == "-x") xmlMode = true;
   val stk = new java.util.Stack[String]
   while (iter.hasNext) {
     val ch = iter.next
@@ -144,6 +151,7 @@ object convert extends App {
           var klass = ""
           var id = ""
           if (tagName == "" && iter.hasNext && iter.head == ' ') {
+            if (xmlMode) error("No tag name")
             tagName = "code"
             iter.next
             nonAttr = ""
@@ -153,9 +161,11 @@ object convert extends App {
               val prefix = iter.head
               iter.next
               if (tagName == "") {
+                if (xmlMode) error("No tag name")
                 tagName = "span"
               }
               if (prefix == '.') {
+                if (xmlMode) error(". in tag name")
                 if (klass == "") klass = name(iter)
                 else klass = klass + " " + name(iter)
               } else {
@@ -169,13 +179,15 @@ object convert extends App {
             }
                   
           if (tagName == "") error("name or . expected after " + ch)
-          if (!elements.contains(tagName) && !tagName.contains(":")) error (tagName + " is not a valid HTML element")
+          if (!xmlMode && !elements.contains(tagName) && !tagName.contains(":")) error (tagName + " is not a valid HTML element")
           print("<")
           print(tagName)
           if (id != "")
             print(" id='" + escapeAttribute(id) + "'")
           if (klass != "")
             print(" class='" + escapeAttribute(klass) + "'")
+          var srcAttr: String = null
+          var altAttr: String = null
           while (nonAttr == null && iter.hasNext && iter.head == ' ') {
             iter.next
             if (iter.hasNext && iter.head == ' ') {
@@ -195,8 +207,11 @@ object convert extends App {
 
                     if (attrName == "class" && klass != "") error("both ." + klass.replace(" ", ".") + " and class='" + attrValue + "'")
                     else if (attrName == "id" && id != "") error("both #" + id + " and id='" + attrValue + "'")
-                    else if (attrName == "href" && !attrValue.startsWith("#") && tagName == "a" && iter.head == END) nonAttr = attrValue
-
+                    else if (!xmlMode && attrName == "href" && !attrValue.startsWith("#") && tagName == "a" && iter.head == END) nonAttr = attrValue
+                    else if (!xmlMode && tagName == "img") {
+                      if (attrName == "src") srcAttr = attrValue;
+                      if (attrName == "alt") altAttr = attrValue;
+                    }
                   } else
                     nonAttr = attrName + "="
                 }
@@ -204,9 +219,13 @@ object convert extends App {
               }
             }
           }
-          if (nonAttr == null) ws(iter, tagName == "pre")
+          if (nonAttr == null) ws(iter, !xmlMode && tagName == "pre")
           if (iter.head == END) {
-            if ((nonAttr == null || nonAttr.trim().equals("")) && voidElements.contains(tagName))
+            if (!xmlMode && tagName == "img") {
+              if (srcAttr == null) error("img without src")
+              else if (altAttr == null) print(" alt='" + escapeAttribute(altFromSrc(srcAttr)) + "'")              
+            }
+            if ((nonAttr == null || nonAttr.trim().equals("")) && (xmlMode || voidElements.contains(tagName)))
               print("/>")
             else {
               print(">");

@@ -1,16 +1,14 @@
-<?xml version='1.0' encoding='UTF-8'?>
-<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
-
-<html>
+<!DOCTYPE html>
+<html xmlns='http://www.w3.org/1999/xhtml'><!-- https://dev.w3.org/html5/html-polyglot/ -->
   <head>
+    <meta charset='UTF-8'/> 
     <title>ch markup</title> 
     <link href='styles.css' rel='stylesheet' type='text/css'/> 
-    <meta http-equiv='content-type' content='text/html; charset=UTF-8'/> 
   </head> 
   <body>
 
     <h1>Compact HTML Markup</h1> 
-    <p>The Compact HTML markup syntax is a representation of XHTML in a less cluttered form that is easier to scan and edit than traditional HTML. The key idea is to write <code>&#9001;em Hello&#9002;</code> instead of <code>&lt;em&gt;Hello&lt;/em&gt;</code>. This avoids the visual clutter of the end tags. The space after the start tag helps too. By using non-ASCII delimiters &#9001;…&#9002;, there need not be any special rules for escaping commonly used characters. In Compact HTML markup, you can write <code>&#9001;pre cout &lt;&lt; "Hello";&#9002;</code> instead of <code>&lt;pre&gt;cout &amp;lt;&amp;lt; &amp;quot;Hello&amp;quot;;&lt;/pre&gt;</code>. </p> 
+    <p>The Compact HTML markup syntax is a representation of XHTML in a less cluttered form that is easier to scan and edit than traditional HTML. The key idea is to write <code>&#9001;em Hello&#9002;</code> instead of <code>&lt;em&gt;Hello&lt;/em&gt;</code>. This avoids the visual clutter of the end tags. The space after the start tag helps too. By using non-ASCII delimiters &#9001;…&#9002;, there need not be any special rules for escaping commonly used characters. In Compact HTML markup, you can write <pre>&#9001;pre cout &lt;&lt; "Hello";&#9002;</pre> instead of <pre>&lt;pre&gt;cout &amp;lt;&amp;lt; &amp;quot;Hello&amp;quot;;&lt;/pre&gt;</pre></p> 
     <h2>Markup Rules</h2> 
     <ol>
       <li>A tag starts with <code>&#9001;</code> and ends with a matching <code>&#9002;</code>. That's a U+2329 (LEFT-POINTING ANGLE BRACKET) and a U+232A (RIGHT-POINTING ANGLE BRACKET).</li> 
@@ -35,7 +33,7 @@
         becomes
         <pre>&lt;img id='hamster' .../&gt;</pre>
         Note that there may be no space before the <code>#</code>.</li>
-      <li>If the tag name is omitted and there is a space after the opening bracket, then the tag name is set to <code>code</code>. For example, <code>&#9001; main&#9002;</code> is <code>&lt;code&gt;main&lt;/code&gt;</code>.</li> 
+      <li>If the tag name is omitted and there is a space after the opening bracket, then the tag name is set to <code>code</code>. For example, <pre>&#9001; main&#9002;</pre> is <pre>&lt;code&gt;main&lt;/code&gt;</pre></li> 
       <li>The tag name (and optional class names) can be followed by attribute name/value pairs. For example,
         <pre>&#9001;img src=hamster.jpeg alt='A hamster'&#9002;</pre>
         or
@@ -45,37 +43,41 @@
         <pre>&#9001;pre
 x=1&#9002;</pre></li>
       <li>If an <code>a</code> element has an <code>href</code> value that doesn't start with a <code>#</code>, has no other attribute, and has no contents, the <code>href</code> attribute value becomes the contents. For example,
-        <pre>&#9001;a href='http://horstmann.com'&#9002;</pre>becomes
+        <pre>&#9001;a href=http://horstmann.com&#9002;</pre>becomes
         <pre>&lt;a href='http://horstmann.com'&gt;http://horstmann.com&lt;/a&gt;</pre></li>
+      <li>if an <code>img</code> element doesn't have an <code>alt</code> attribute, one is provided with the name of the image file (with directory path and extension removed).</li>
       <li>If the <code>&#9001;</code> is followed by a <code>!</code> or <code>?</code>, everything until the matching <code>&#9002;</code> is copied verbatim, and surrounded by <code>&lt; &gt;</code>. This lets you include processing instructions, comments, and doctypes. For example, the top of your document can start out as 
         <pre>&#9001;?xml version='1.0' encoding='UTF-8'?&#9002;
 &#9001;!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN'
-      'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'&#9002;</pre> 
+  'http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd'&#9002;</pre> 
       </li> 
       <li>If the &#9001; is followed by a <code>&amp;</code>, then everything up to the matching &#9002; is copied verbatim and followed by a <code>;</code>. This lets you enter entity references. For example,
         <pre>&#9001;&amp;mdash&#9002;</pre>
         becomes
         <pre>&amp;mdash;</pre>
         There are only two (rare) situations where you must use this feature. To include &#9001; and &#9002;, use <code>&#9001;&amp;#9001&#9002;</code> and <code>&#9001;&amp;#9002&#9002;</code>. To include a single quote in a quoted attribute, use <code>&#9001;&amp;apos&#9002;</code>. In all other cases, you need not worry about escaping. For example, a <code>&amp;</code> in an attribute is correctly converted into <code>&amp;amp;</code>. 
-        <pre>&#9001;a href='http://google.com?q=Alice &amp; Bobs&#9001;&amp;apos&#9002;s Restaurant'&#9002;</pre>
+        <pre>&#9001;a href='http://google.com?q=Alice &amp; Bob&#9001;&amp;apos&#9002;s Restaurant'&#9002;</pre>
         turns into
         <pre>&lt;a href='http://google.com?q=Alice &amp;amp; Bob&amp;apos;s Restaurant'&gt;</pre></li>
-      <li>The XHTML void elements <code>area</code>, <code>base</code>, <code>br</code>, <code>col</code>, <code>command</code>, <code>embed</code>, <code>hr</code>, <code>img</code>, <code>input</code>, <code>keygen</code>, <code>link</code>, <code>meta</code>, <code>param</code>, <code>source</code>, <code>track</code>, <code>wbr</code> are self-closing. For example, <code>&#9001;hr&#9002;</code> is <code>&lt;hr/&gt;</code>, but <code>&#9001;script src='slidy.js'&#9002;</code> is <code>&lt;script src='slidy.js'&gt;&lt;/script&gt;</code>.</li> 
+      <li>The XHTML void elements <code>area</code>, <code>base</code>, <code>br</code>, <code>col</code>, <code>command</code>, <code>embed</code>, <code>hr</code>, <code>img</code>, <code>input</code>, <code>keygen</code>, <code>link</code>, <code>meta</code>, <code>param</code>, <code>source</code>, <code>track</code>, <code>wbr</code> are self-closing. For example, <pre>&#9001;hr&#9002;
+&#9001;script src='slidy.js'&#9002;</pre> yield <pre>&lt;hr/&gt;
+&lt;script src='slidy.js'&gt;&lt;/script&gt;</pre></li>
+      <li>If the converter is called with the <code>-x</code> flag (which is set in the <code>ch</code> script when the file extension is <code>.chx</code>), then the special XHTML handling rules about <code>class</code> attributes, <code>span</code>, <code>code</code>, <code>a</code>, and <code>img</code> tags, and self-closing tags, do not apply.</li>
     </ol> 
     <h2>Rationale</h2> 
     <ul>
       <li><a href='http://daringfireball.net/projects/markdown/'>Markdown</a> has a noble goal: 
         <blockquote>The idea is that a Markdown-formatted document should be publishable as-is, as plain text, without looking like it’s been marked up with tags or formatting instructions.</blockquote> But to achieve that goal, there are rules whose details are <a href='http://daringfireball.net/projects/markdown/syntax'>fiendishly complex</a>. And as soon as the going gets rough, you reach the limitations of Markdown and have to use HTML. 
       </li>
-      <li>What about <a href='http://www.methods.co.nz/asciidoc/userguide.html'>AsciiDoc</a>? It's much less limited than Markdown, but it's pretty complex.</li>
+      <li>What about <a href='http://www.methods.co.nz/asciidoc/userguide.html'>AsciiDoc</a> or <a href='http://madoko.org/reference.html'>Madoko</a>? They are much less limited than Markdown, but both are pretty complex.</li>
       <li>So why not just author in HTML? It is too verbose, with its matching start and end tags. And it is a hassle that one has to escape characters that are fairly common in programming (<code>&amp; &lt;</code>).</li> 
-      <li>Having <code>(em Hello)</code> instead of <code>&lt;em&gt;Hello&lt;/em&gt;</code> makes perfect sense to any Lisp programmer, and the <a href='http://xahlee.info/comp/html6.html'>SXML notation</a> follows this idea to its logical conclusion. It's a fine notation, but not very author-friendly.</li> 
+      <li>Having <code>(em Hello)</code> instead of <code>&lt;em&gt;Hello&lt;/em&gt;</code> makes perfect sense to any Lisp programmer, and the <a href='https://en.wikipedia.org/wiki/SXML'>SXML notation</a> follows this idea to its logical conclusion. It's a fine notation, but not very author-friendly.</li> 
       <li>Xah Lee has a <a href='http://xahlee.info/comp/html6.html'>related proposal</a> that makes use of three delimiter pairs: 
         <pre>    〔link 「rel “self” href “http://xahlee.org/emacs/blog.xml”」〕</pre>  
       </li> 
       <li>How do you enter the brackets on your keyboard? If you use Emacs, then simply add the following to your <code>.emacs</code>: 
         <pre>(fset 'anglebrackets [?&#9001; ?&#9002; left]) 
-(global-set-key (kbd "M-[") <!-- ] -->'anglebrackets)</pre> Then typing M-[ <!-- ] --> yields a pair of brackets, with the cursor in between. Alternatively, if you use Linux, make a <code>~/.XCompose</code> file with this content: 
+(global-set-key [(shift return)] 'anglebrackets)</pre> Then typing Shift Return yields a pair of brackets, with the cursor in between. Alternatively, if you use Linux, make a <code>~/.XCompose</code> file with this content: 
         <pre>include "%L"
 &lt;Multi_key&gt; &lt;bracketleft&gt;        : "&#9001;"   U2329 # LEFT-POINTING ANGLE BRACKET
 &lt;Multi_key&gt; &lt;bracketright&gt;       : "&#9002;"   U232A # RIGHT-POINTING ANGLE BRACKET</pre> Then you can use Compose [ and Compose ] to enter the brackets. I map my <a href='http://en.wikipedia.org/wiki/Compose_key'>Compose key</a> to Caps Lock, which makes this quite convenient. 
@@ -83,12 +85,13 @@ x=1&#9002;</pre></li>
       <li>How do you match the brackets? Emacs will match any kind of Unicode brackets, and if your text editor is any good, it will do the same.</li> 
     </ul> 
     <p>So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.</p>
-    <p>You can download the source of the converter from <a href='https://bitbucket.org/cayhorstmann/ch-mode'>https://bitbucket.org/cayhorstmann/ch-mode</a>. Installation instructions are in <code>ch-mode.el</code>.</p>
+    <h2>Installation</h2>
+    <p>You can download the source of the converter and a handy Emacs mode with syntax coloring from <a href='https://bitbucket.org/cayhorstmann/ch-mode'>https://bitbucket.org/cayhorstmann/ch-mode</a>. Installation instructions are in <code>ch-mode.el</code>.</p>
     <p>If you just want the converter and not the Emacs mode, then simply make a JAR file by running</p>
       <pre>scalac *.scala
 jar cvf ch.jar *.class
-    rm *.class</pre>
-  <p>You need Scala version 2.10 or later, which needs Java 7 or later.</p>
-  <p>Move the ch script and ch.jar to ~/bin or another location on your PATH. If you don't have <code>JAVA_HOME</code> and <code>SCALA_HOME</code> set, edit the ch script to set them.</p>
+rm *.class</pre>
+  <p>You need <a href='http://scala-lang.org/'>Scala</a> version 2.10 or later, which needs Java 7 or later.</p>
+  <p>Move the <code>ch</code> script and <code>ch.jar</code> to <code>~/bin</code> or another location on your <code>PATH</code>. If you don't have <code>JAVA_HOME</code> and <code>SCALA_HOME</code> set, edit the <code>ch</code> script to set them.</p>
   </body> 
 </html>

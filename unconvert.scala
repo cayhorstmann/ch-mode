@@ -9,7 +9,7 @@ object unconvert extends App {
   val source = scala.io.Source.fromInputStream(in)
   val parser = new XhtmlParser(source)
   val doc = parser.initialize.document
-  val root = doc.docElem
+  val root = doc.docElem.asInstanceOf[Elem]
   val dtd = doc.dtd
   val inlineElements = Set("a", "abbr", "acronym", "b", "bdo", 
     "big", "br", "cite", "code", "dfn", "em", "font", "i", "img",
@@ -22,7 +22,7 @@ object unconvert extends App {
   // println("〈?xml version='1.0' encoding='UTF-8'?〉")
   if (dtd != null && dtd.externalID != null)
     println("〈!DOCTYPE html " + dtd.externalID + "〉")
-  write(root.asInstanceOf[Elem], 0)
+  write(root, 0, Seq())
 
   def writeIndent(indent: Int) {
     if (first) first = false else println()
@@ -61,11 +61,22 @@ object unconvert extends App {
     } reduce (_ + _)
    */
 
-  def write(e: Elem, indent: Int) {
+  def namespaces(e: Elem) = {
+    var scope = e.scope
+    val result = new scala.collection.mutable.ArrayBuffer[String]
+    while (scope != null) {
+      if (scope.uri != null)
+        result += (if (scope.prefix != null) ":" + scope.prefix else "") + "=" + scope.uri
+      scope = scope.parent
+    }
+    result.reverse
+  }
+
+  def write(e: Elem, indent: Int, parentNamespaces: Seq[String]) {
     val label = if (e.prefix == null) e.label else e.prefix + ":" + e.label
     val isInline = inlineElements.contains(label)
     if (!isInline) writeIndent(indent)
-
+    val allNamespaces = namespaces(e)
     print("〈")
     if (!(label == "code" && e.attributes.size == 0)) {
       if (label != "span") print(label)
@@ -84,17 +95,9 @@ object unconvert extends App {
       //else if (label == "span")
       //  print(label)
 
-      if (indent == 0) { // root node, write namespaces
-        var scope = e.scope
-        val namespaces = new scala.collection.mutable.ArrayBuffer[String]
-        while (scope != null) {
-          if (scope.uri != null)
-            namespaces += (if (scope.prefix != null) ":" + scope.prefix else "") + "='" + scope.uri + "'"
-          scope = scope.parent
-        }
-        for (ns <- namespaces.reverse)
-          print(" xmlns" + ns)
-      }
+      val ownNamespaces = allNamespaces.diff(parentNamespaces)
+      for (ns <- ownNamespaces)
+        print(" xmlns" + ns)      
 
       for (attr <- e.attributes)
         if (!(attr.prefixedKey == "class" && klass != "" ||
@@ -110,7 +113,7 @@ object unconvert extends App {
 
     for (n <- e.child) 
       n match {
-        case e: Elem => write(e, indent + 1)
+        case e: Elem => write(e, indent + 1, allNamespaces)
         case t: Text => {
           var pre = '?'
           for (c <- t.data)

@@ -14,7 +14,6 @@
 
 ;; You should have received a copy of the GNU General Public License
 ;; along with this program.  If not, see <http://www.gnu.org/licenses/>.
-
 ;;
 ;; Installation:
 ;;
@@ -89,7 +88,7 @@
   "Face name to use for h4.")
 
 (defface ch-code-face 
-  '((t (:family "Monospace"))) 
+  '((t (:family "fixed"))) 
   "ch code face" :group 'ch-faces)
 (defface ch-strong-face 
   '((t (:weight bold))) 
@@ -127,6 +126,24 @@
                    (setq result (list beg (point))))))
         (error nil))
       result)))
+
+(defun ch-eliminate-tag ()
+  "eliminate current tag"
+  (interactive)
+  (let ((beg nil) (end nil) (taglen nil))
+    (backward-up-list 1)
+    (setq beg (point))
+    (forward-whitespace 1)
+    (setq taglen (- (point) beg 1))
+    (goto-char beg)
+    (forward-list)
+    (setq end (point))
+    (delete-backward-char 1)
+    (goto-char beg)
+    (delete-char taglen)
+    (goto-char (- end taglen))
+))
+
 
 
 (defun ch-match-pre (last)                            
@@ -257,13 +274,13 @@
 (defun ch-insert-figure (caption)
   (interactive "sCaption: \n")
   (let ((id (ch-to-id caption)))
-    (insert (concat "〈a.figureref href='#" id "'〉\n" "    〈div.figure id='" id "'\n      〈img alt='" caption "' src='" id ".png'〉\n      〈div.caption " caption "〉\n    〉\n"))))
+    (insert (concat "〈a.figureref href=#" id "〉\n" "    〈div.figure#" id "\n      〈img alt='" caption "' src=images/" id ".png〉\n      〈div " caption "〉\n    〉\n"))))
 
 (defun ch-insert-table (caption rows columns)
   (interactive "sCaption: \nsRows: \nsColumns: \n")
   (let (pos res id)
     (setq id (ch-to-id caption))
-    (insert (concat "〈a.tableref href='#" id "'〉\n" "    〈table id='" id "'\n      〈caption "))
+    (insert (concat "〈a.tableref href='#" id "'〉\n" "    〈table#" id "\n      〈caption "))
     (setq pos (point))
     (insert caption)
     (insert "〉\n      〈tr\n")
@@ -325,6 +342,8 @@
 
 (setq auto-mode-alist       
       (cons '("\\.ch\\'" . ch-mode) auto-mode-alist))
+(setq auto-mode-alist       
+      (cons '("\\.chx\\'" . ch-mode) auto-mode-alist))
 
 (defun font-lock-and-indent ()
   "Font lock and indent."
@@ -393,11 +412,14 @@
 (defun ch-after-save-hook ()
   "After saving a ch file, run the ch script"
   (if (and buffer-file-name
-           (string-match "\.ch$" buffer-file-name))
+           (string-match "\.chx?$" buffer-file-name))
       (progn
         (setq cmd (concat ch-command " " (shell-quote-argument buffer-file-name)))
         
-        (message (shell-command-to-string cmd)))))
+        (setq output (shell-command-to-string cmd))
+        (if (> (length (split-string output "\n")) 2)
+            (message output))
+        )))
 (add-hook 'after-save-hook 'ch-after-save-hook)
 
 (provide 'ch-mode)

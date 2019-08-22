@@ -32,6 +32,17 @@ for IN in $@ ; do
 	fi
     fi
 
+    if [[ "$IN" = *".chx" ]] ; then
+	OUT=${IN/.chx/.xml}
+	if [ -z "$FORCE" ] && [ $OUT -nt $IN ] ; then 
+            echo "Error: $OUT is newer than $IN"
+	else
+	    if [[  $# -gt 1 ]] ; then echo $IN ; fi
+            echo "$IN -> $OUT"
+            $SCALA_HOME/bin/scala -classpath $CLASSPATH convert -x< $IN > $OUT
+	fi
+    fi
+
     if [[ "$IN" = *".html" ]] ; then
 	OUT=${IN/.html/.ch}
 
@@ -54,7 +65,7 @@ for IN in $@ ; do
     fi
 
     if [[ "$IN" = *".xml" ]] ; then
-	OUT=${IN/.xml/.ch}
+	OUT=${IN/.xml/.chx}
 	if [ $OUT -nt $IN ]; then 
             echo "$OUT is newer than $IN"
 	else
