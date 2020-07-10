@@ -28,14 +28,14 @@
       〈li If the tag name is omitted and there is a period after the opening bracket, the tag name is set to 〈 span〉. For example,
         〈pre 〈&#9001〉.hand John Hancock〈&#9002〉〉
         is
-        〈pre <span class='hand' John Hancock</span>〉〉
+        〈pre <span class='hand' John Hancock</span>〉 A span without any classes can be indicated as 〈 〈&#9001〉. ...〈&#9002〉〉〉
       〈li After the tag name and any dotted class names, you can have an id prefixed by 〈 #〉:
-        〈pre 〈&#9001〉img#hamster ...〈&#9002〉〉
+        〈pre 〈&#9001〉img.margin#hamster ...〈&#9002〉〉
         becomes
-        〈pre <img id='hamster' .../>〉
+        〈pre <img class='margin' id='hamster' .../>〉
         Note that there may be no space before the 〈 #〉.〉
       〈li If the tag name is omitted and there is a space after the opening bracket, then the tag name is set to 〈 code〉. For example, 〈pre 〈&#9001〉 main〈&#9002〉〉 is 〈pre <code>main</code>〉〉 
-      〈li The tag name (and optional class names) can be followed by attribute name/value pairs. For example,
+      〈li The tag name (and optional class names and id) can be followed by attribute name/value pairs. For example,
         〈pre 〈&#9001〉img src=hamster.jpeg alt='A hamster'〈&#9002〉〉
         or
         〈pre 〈&#9001〉a href=http://horstmann.com My homepage〈&#9002〉〉
@@ -45,12 +45,20 @@
         〈pre
 〈&#9001〉pre
 x=1〈&#9002〉〉〉
-      〈li If an 〈 a〉 element has an 〈 href〉 value that doesn't start with a 〈 #〉, has no other attribute, and has no contents, the 〈 href〉 attribute value becomes the contents. For example,
+      〈li If an 〈 a〉 element has an 〈 href〉 value that doesn't start with a 〈 #〉, has no other attribute, and has no text contents, the 〈 href〉 attribute value becomes the contents. For example,
         〈pre
 〈&#9001〉a href=http://horstmann.com〈&#9002〉〉becomes
         〈pre
-<a href='http://horstmann.com'>http://horstmann.com</a>〉〉
+<a href='http://horstmann.com'>http://horstmann.com</a>〉
+        However, with a relative URL (starting with something other than 〈 http://〉 or 〈 https://〉), only the filename is used for the content:
+        〈pre
+〈&#9001〉a href=../files/images.zip〈&#9002〉〉
+        becomes
+        〈pre
+<a href='../files/images.zip'>images.zip</a>〉
+      〉
       〈li if an 〈 img〉 element doesn't have an 〈 alt〉 attribute, one is provided with the name of the image file (with directory path and extension removed).〉
+      〈li The text content of a 〈 pre〉 element and its descendents may not contain whitespace other than space (U+0020), line feed (U+000A) or carriage return (U+000D). In particular, tab (U+0009) is not allowed.〉
       〈li If the 〈 〈&#9001〉〉 is followed by a 〈 !〉 or 〈 ?〉, everything until the matching 〈 〈&#9002〉〉 is copied verbatim, and surrounded by 〈 < >〉. This lets you include processing instructions, comments, and doctypes. For example, the top of your document can start out as 
         〈pre
 〈&#9001〉?xml version='1.0' encoding='UTF-8'?〈&#9002〉
@@ -61,25 +69,26 @@ x=1〈&#9002〉〉〉
         〈pre 〈&#9001〉&mdash〈&#9002〉〉
         becomes
         〈pre &mdash;〉
-        There are only two (rare) situations where you must use this feature. To include 〈&#9001〉 and 〈&#9002〉, use 〈 〈&#9001〉&#9001〈&#9002〉〉 and 〈 〈&#9001〉&#9002〈&#9002〉〉. To include a single quote in a quoted attribute, use 〈 〈&#9001〉&apos〈&#9002〉〉. In all other cases, you need not worry about escaping. For example, a 〈 &〉 in an attribute is correctly converted into 〈 &amp;〉. 
+        There are only two (rare) situations where you must use this feature. To include 〈&#9001〉 and 〈&#9002〉, use 〈 〈&#9001〉&#9001〈&#9002〉〉 and 〈 〈&#9001〉&#9002〈&#9002〉〉. To include a single quote in a quoted attribute, use 〈 〈&#9001〉&apos〈&#9002〉〉.  
         〈pre
 〈&#9001〉a href='http://google.com?q=Alice & Bob〈&#9001〉&apos〈&#9002〉s Restaurant'〈&#9002〉〉
         turns into
         〈pre
-<a href='http://google.com?q=Alice &amp; Bob&apos;s Restaurant'>〉〉
+<a href='http://google.com?q=Alice &amp; Bob&apos;s Restaurant'>〉
+      In all other cases, you need not worry about escaping. For example, in the preceding example, the 〈 &〉 in the 〈 href〉 attribute was correctly converted into 〈 &amp;〉.〉
       〈li The XHTML void elements 〈 area〉, 〈 base〉, 〈 br〉, 〈 col〉, 〈 command〉, 〈 embed〉, 〈 hr〉, 〈 img〉, 〈 input〉, 〈 keygen〉, 〈 link〉, 〈 meta〉, 〈 param〉, 〈 source〉, 〈 track〉, 〈 wbr〉 are self-closing. For example, 〈pre
 〈&#9001〉hr〈&#9002〉
 〈&#9001〉script src='slidy.js'〈&#9002〉〉 yield 〈pre
 <hr/>
 <script src='slidy.js'></script>〉〉
-      〈li If the converter is called with the 〈 -x〉 flag (which is set in the 〈 ch〉 script when the file extension is 〈 .chx〉), then the special XHTML handling rules about 〈 class〉 attributes, 〈 span〉, 〈 code〉, 〈 a〉, and 〈 img〉 tags, and self-closing tags, do not apply.〉
+      〈li If the converter is called with the 〈 -x〉 flag (which is set in the 〈 ch〉 script when the file extension is 〈 .chx〉), then the special XHTML handling rules about 〈 class〉 attributes, 〈 span〉, 〈 code〉, 〈 a〉, 〈 img〉, and 〈 pre〉 elements, and void elements, do not apply.〉
     〉 
     〈h2 Rationale〉 
     〈ul  
       〈li 〈a href=http://daringfireball.net/projects/markdown/  Markdown〉 has a noble goal: 
         〈blockquote The idea is that a Markdown-formatted document should be publishable as-is, as plain text, without looking like it’s been marked up with tags or formatting instructions.〉 But to achieve that goal, there are rules whose details are 〈a href=http://daringfireball.net/projects/markdown/syntax fiendishly complex〉. And as soon as the going gets rough, you reach the limitations of Markdown and have to use HTML. 
       〉
-      〈li What about 〈a href=http://www.methods.co.nz/asciidoc/userguide.html AsciiDoc〉 or 〈a href=http://madoko.org/reference.html Madoko〉? They are much less limited than Markdown, but both are pretty complex.〉
+      〈li What about 〈a href=http://www.methods.co.nz/asciidoc/userguide.html AsciiDoc〉, 〈a href=https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html reStructuredText〉 or 〈a href=http://madoko.org/reference.html Madoko〉? They are much less limited than Markdown, but all are pretty complex.〉
       〈li So why not just author in HTML? It is too verbose, with its matching start and end tags. And it is a hassle that one has to escape characters that are fairly common in programming (〈 & <〉).〉 
       〈li Having 〈 (em Hello)〉 instead of 〈 <em>Hello</em>〉 makes perfect sense to any Lisp programmer, and the 〈a href=https://en.wikipedia.org/wiki/SXML  SXML notation〉 follows this idea to its logical conclusion. It's a fine notation, but not very author-friendly.〉 
       〈li Xah Lee has a 〈a href=http://xahlee.info/comp/html6.html  related proposal〉 that makes use of three delimiter pairs: 
@@ -97,9 +106,9 @@ include "%L"
       〉 
       〈li How do you match the brackets? Emacs will match any kind of Unicode brackets, and if your text editor is any good, it will do the same.〉 
     〉 
-    〈p So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.〉
+    〈p So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, ids, spans, code, and character references). An automatic translator converts between this format and XML.〉
     〈h2 Installation〉
-    〈p You can download the source of the converter and a handy Emacs mode with syntax coloring from 〈a href=https://bitbucket.org/cayhorstmann/ch-mode〉. Installation instructions are in 〈 ch-mode.el〉.〉
+    〈p You can download the source of the converter and a handy Emacs mode with syntax coloring from 〈a href=https://github.org/cayhorstmann/ch-mode〉. Installation instructions are in 〈 ch-mode.el〉.〉
     〈p If you just want the converter and not the Emacs mode, then simply make a JAR file by running〉
       〈pre
 scalac *.scala

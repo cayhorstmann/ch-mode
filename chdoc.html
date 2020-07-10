@@ -27,14 +27,14 @@
       <li>If the tag name is omitted and there is a period after the opening bracket, the tag name is set to <code>span</code>. For example,
         <pre>&#9001;.hand John Hancock&#9002;</pre>
         is
-        <pre>&lt;span class='hand' John Hancock&lt;/span&gt;</pre></li>
+        <pre>&lt;span class='hand' John Hancock&lt;/span&gt;</pre> A span without any classes can be indicated as <code>&#9001;. ...&#9002;</code></li>
       <li>After the tag name and any dotted class names, you can have an id prefixed by <code>#</code>:
-        <pre>&#9001;img#hamster ...&#9002;</pre>
+        <pre>&#9001;img.margin#hamster ...&#9002;</pre>
         becomes
-        <pre>&lt;img id='hamster' .../&gt;</pre>
+        <pre>&lt;img class='margin' id='hamster' .../&gt;</pre>
         Note that there may be no space before the <code>#</code>.</li>
       <li>If the tag name is omitted and there is a space after the opening bracket, then the tag name is set to <code>code</code>. For example, <pre>&#9001; main&#9002;</pre> is <pre>&lt;code&gt;main&lt;/code&gt;</pre></li> 
-      <li>The tag name (and optional class names) can be followed by attribute name/value pairs. For example,
+      <li>The tag name (and optional class names and id) can be followed by attribute name/value pairs. For example,
         <pre>&#9001;img src=hamster.jpeg alt='A hamster'&#9002;</pre>
         or
         <pre>&#9001;a href=http://horstmann.com My homepage&#9002;</pre>
@@ -42,10 +42,16 @@
         <pre>&#9001;code  x=1&#9002;</pre> or 
         <pre>&#9001;pre
 x=1&#9002;</pre></li>
-      <li>If an <code>a</code> element has an <code>href</code> value that doesn't start with a <code>#</code>, has no other attribute, and has no contents, the <code>href</code> attribute value becomes the contents. For example,
+      <li>If an <code>a</code> element has an <code>href</code> value that doesn't start with a <code>#</code>, has no other attribute, and has no text contents, the <code>href</code> attribute value becomes the contents. For example,
         <pre>&#9001;a href=http://horstmann.com&#9002;</pre>becomes
-        <pre>&lt;a href='http://horstmann.com'&gt;http://horstmann.com&lt;/a&gt;</pre></li>
+        <pre>&lt;a href='http://horstmann.com'&gt;http://horstmann.com&lt;/a&gt;</pre>
+        However, with a relative URL (starting with something other than <code>http://</code> or <code>https://</code>), only the filename is used for the content:
+        <pre>&#9001;a href=../files/images.zip&#9002;</pre>
+        becomes
+        <pre>&lt;a href='../files/images.zip'&gt;images.zip&lt;/a&gt;</pre>
+      </li>
       <li>if an <code>img</code> element doesn't have an <code>alt</code> attribute, one is provided with the name of the image file (with directory path and extension removed).</li>
+      <li>The text content of a <code>pre</code> element and its descendents may not contain whitespace other than space (U+0020), line feed (U+000A) or carriage return (U+000D). In particular, tab (U+0009) is not allowed.</li>
       <li>If the <code>&#9001;</code> is followed by a <code>!</code> or <code>?</code>, everything until the matching <code>&#9002;</code> is copied verbatim, and surrounded by <code>&lt; &gt;</code>. This lets you include processing instructions, comments, and doctypes. For example, the top of your document can start out as 
         <pre>&#9001;?xml version='1.0' encoding='UTF-8'?&#9002;
 &#9001;!DOCTYPE html PUBLIC '-//W3C//DTD XHTML 1.0 Strict//EN'
@@ -55,21 +61,22 @@ x=1&#9002;</pre></li>
         <pre>&#9001;&amp;mdash&#9002;</pre>
         becomes
         <pre>&amp;mdash;</pre>
-        There are only two (rare) situations where you must use this feature. To include &#9001; and &#9002;, use <code>&#9001;&amp;#9001&#9002;</code> and <code>&#9001;&amp;#9002&#9002;</code>. To include a single quote in a quoted attribute, use <code>&#9001;&amp;apos&#9002;</code>. In all other cases, you need not worry about escaping. For example, a <code>&amp;</code> in an attribute is correctly converted into <code>&amp;amp;</code>. 
+        There are only two (rare) situations where you must use this feature. To include &#9001; and &#9002;, use <code>&#9001;&amp;#9001&#9002;</code> and <code>&#9001;&amp;#9002&#9002;</code>. To include a single quote in a quoted attribute, use <code>&#9001;&amp;apos&#9002;</code>.  
         <pre>&#9001;a href='http://google.com?q=Alice &amp; Bob&#9001;&amp;apos&#9002;s Restaurant'&#9002;</pre>
         turns into
-        <pre>&lt;a href='http://google.com?q=Alice &amp;amp; Bob&amp;apos;s Restaurant'&gt;</pre></li>
+        <pre>&lt;a href='http://google.com?q=Alice &amp;amp; Bob&amp;apos;s Restaurant'&gt;</pre>
+      In all other cases, you need not worry about escaping. For example, in the preceding example, the <code>&amp;</code> in the <code>href</code> attribute was correctly converted into <code>&amp;amp;</code>.</li>
       <li>The XHTML void elements <code>area</code>, <code>base</code>, <code>br</code>, <code>col</code>, <code>command</code>, <code>embed</code>, <code>hr</code>, <code>img</code>, <code>input</code>, <code>keygen</code>, <code>link</code>, <code>meta</code>, <code>param</code>, <code>source</code>, <code>track</code>, <code>wbr</code> are self-closing. For example, <pre>&#9001;hr&#9002;
 &#9001;script src='slidy.js'&#9002;</pre> yield <pre>&lt;hr/&gt;
 &lt;script src='slidy.js'&gt;&lt;/script&gt;</pre></li>
-      <li>If the converter is called with the <code>-x</code> flag (which is set in the <code>ch</code> script when the file extension is <code>.chx</code>), then the special XHTML handling rules about <code>class</code> attributes, <code>span</code>, <code>code</code>, <code>a</code>, and <code>img</code> tags, and self-closing tags, do not apply.</li>
+      <li>If the converter is called with the <code>-x</code> flag (which is set in the <code>ch</code> script when the file extension is <code>.chx</code>), then the special XHTML handling rules about <code>class</code> attributes, <code>span</code>, <code>code</code>, <code>a</code>, <code>img</code>, and <code>pre</code> elements, and void elements, do not apply.</li>
     </ol> 
     <h2>Rationale</h2> 
     <ul>
       <li><a href='http://daringfireball.net/projects/markdown/'>Markdown</a> has a noble goal: 
         <blockquote>The idea is that a Markdown-formatted document should be publishable as-is, as plain text, without looking like it’s been marked up with tags or formatting instructions.</blockquote> But to achieve that goal, there are rules whose details are <a href='http://daringfireball.net/projects/markdown/syntax'>fiendishly complex</a>. And as soon as the going gets rough, you reach the limitations of Markdown and have to use HTML. 
       </li>
-      <li>What about <a href='http://www.methods.co.nz/asciidoc/userguide.html'>AsciiDoc</a> or <a href='http://madoko.org/reference.html'>Madoko</a>? They are much less limited than Markdown, but both are pretty complex.</li>
+      <li>What about <a href='http://www.methods.co.nz/asciidoc/userguide.html'>AsciiDoc</a>, <a href='https://docutils.sourceforge.io/docs/ref/rst/restructuredtext.html'>reStructuredText</a> or <a href='http://madoko.org/reference.html'>Madoko</a>? They are much less limited than Markdown, but all are pretty complex.</li>
       <li>So why not just author in HTML? It is too verbose, with its matching start and end tags. And it is a hassle that one has to escape characters that are fairly common in programming (<code>&amp; &lt;</code>).</li> 
       <li>Having <code>(em Hello)</code> instead of <code>&lt;em&gt;Hello&lt;/em&gt;</code> makes perfect sense to any Lisp programmer, and the <a href='https://en.wikipedia.org/wiki/SXML'>SXML notation</a> follows this idea to its logical conclusion. It's a fine notation, but not very author-friendly.</li> 
       <li>Xah Lee has a <a href='http://xahlee.info/comp/html6.html'>related proposal</a> that makes use of three delimiter pairs: 
@@ -84,9 +91,9 @@ x=1&#9002;</pre></li>
       </li> 
       <li>How do you match the brackets? Emacs will match any kind of Unicode brackets, and if your text editor is any good, it will do the same.</li> 
     </ul> 
-    <p>So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, spans, ids, code, and character references). An automatic translator converts between this format and XML.</p>
+    <p>So, there you have it. An XML entry format, optimized for XHTML, that removes the tedium of end tags and provides convenient shortcuts for common HTML constructs (classes, ids, spans, code, and character references). An automatic translator converts between this format and XML.</p>
     <h2>Installation</h2>
-    <p>You can download the source of the converter and a handy Emacs mode with syntax coloring from <a href='https://bitbucket.org/cayhorstmann/ch-mode'>https://bitbucket.org/cayhorstmann/ch-mode</a>. Installation instructions are in <code>ch-mode.el</code>.</p>
+    <p>You can download the source of the converter and a handy Emacs mode with syntax coloring from <a href='https://github.org/cayhorstmann/ch-mode'>https://github.org/cayhorstmann/ch-mode</a>. Installation instructions are in <code>ch-mode.el</code>.</p>
     <p>If you just want the converter and not the Emacs mode, then simply make a JAR file by running</p>
       <pre>scalac *.scala
 jar cvf ch.jar *.class

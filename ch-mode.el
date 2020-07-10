@@ -311,14 +311,54 @@
   (interactive)
   (browse-url-generic (concat "file://" (shell-quote-argument (replace-regexp-in-string "[.]ch" ".html" buffer-file-name)))))
 
-(fset 'ch-pre
-   [return ?〈 ?p ?r ?e ?  return home ?〉 left])
+(defun ch-pre ()
+  (interactive)
+  (let (col pos)
+    (setq col (current-indentation))    
+    (insert "\n")
+    (indent-to col)
+    (insert "〈pre")
+    (insert "\n")
+    (setq pos (point))
+    (insert "\n〉")
+    (goto-char pos)))
 
-(fset 'ch-ul
-   [return ?〈 ?u ?l return ?〈 ?l ?i ?  ?〉 return ?〈 ?l ?i ?  ?〉 return ?〈 ?l ?i ?  ?〉 return ?〉 left backspace backspace up right right right right right right])
+(defun ch-items (tag)
+  (let (col pos)
+    (if (not (string-match "^[[:blank:]]*$"
+        (buffer-substring (line-beginning-position) (point))))
+          (newline-and-indent))
+    (if (not (string-match "^[[:blank:]]*$"
+        (buffer-substring (point) (line-end-position))))
+        (progn
+          (newline-and-indent)
+          (forward-line -1)
+          (indent-for-tab-command)          
+          ))    
+    (insert tag)    
+    (backward-char 1)
+    (newline-and-indent)
+    (insert "〈li 〉")
+    (indent-for-tab-command)
+    (forward-char 4)
+    (setq pos (point))
+    (forward-char 1)
+    (newline-and-indent)
+    (insert "〈li 〉")    
+    (newline-and-indent)
+    (insert "〈li 〉")    
+    (indent-for-tab-command)
+    (forward-char 5)
+    (newline-and-indent)
+    (goto-char pos)))
 
-(fset 'ch-ol
-   [return ?〈 ?o ?l return ?〈 ?l ?i ?  ?〉 return ?〈 ?l ?i ?  ?〉 return ?〈 ?l ?i ?  ?〉 return ?〉 left backspace backspace up right right right right right right])
+(defun ch-ul ()
+  (interactive)
+  (ch-items "〈ul〉"))
+
+(defun ch-ol ()
+  (interactive)
+  (ch-items "〈ol〉"))
 
 (define-derived-mode ch-mode text-mode
   (setq font-lock-defaults '(ch-font-lock-defaults))

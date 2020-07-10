@@ -9,14 +9,19 @@ object convert extends App {
   val voidElements = Set("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr") // http://dev.w3.org/html5/markup/syntax.html
 
   val elements = Set(
-"a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "data", "datalist", "dd", "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "menu", "menuitem", "meta", "meter", "nav", "nobr", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp"
-, "math", "mi", "mo", "mn", "mrow", "mtable", "mtr", "mtd", "mfrac", "msup", "maction", "menclose", "mfenced", "mglyph", "mover", "mroot", "ms", "msqrt", "msub", "msubsup", "mtable", "mtext", "munder", "mover", "munderover", "mstyle", "svg"
+"a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "data", "datalist", "dd", "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "menu", "menuitem", "meta", "meter", "nav", "nobr", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp",
+  "math", "mi", "mo", "mn", "mrow", "mtable", "mtr", "mtd", "mfrac", "msup", "maction", "menclose", "mfenced", "mglyph", "mover", "mroot", "ms", "msqrt", "msub", "msubsup", "mtable", "mtext", "munder", "mover", "munderover", "mstyle",
+  "svg", "animate", "animateMotion", "animateTransform", "circle", "clipPath", "color-profile", "defs", "desc", "discard", "ellipse", "feBlend", "feColorMatrix", "feComponentTransfer", "feComposite", "feConvolveMatrix", "feDiffuseLighting", "feDisplacementMap", "feDistantLight", "feDropShadow", "feFlood", "feFuncA", "feFuncB", "feFuncG", "feFuncR", "feGaussianBlur", "feImage", "feMerge", "feMergeNode", "feMorphology", "feOffset", "fePointLight", "feSpecularLighting", "feSpotLight", "feTile", "feTurbulence", "filter", "foreignObject", "g", "hatch", "hatchpath", "image", "line", "linearGradient", "marker", "mask", "mesh", "meshgradient", "meshpatch", "meshrow", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialGradient", "rect", "set", "solidcolor", "stop", "style", "switch", "symbol", "text", "textPath", "title", "tspan", "unknown", "use", "view"
   )
   var xmlMode = false
 
   def error(msg: String) {    
     System.err.println(line + ": " + msg) 
     System.exit(0)
+  }
+
+  def warning(msg: String) {    
+    System.err.println(line + ": " + msg) 
   }
 
   def ws(iter: BufferedIterator[Char], eolOnly: Boolean = false) {
@@ -43,8 +48,10 @@ object convert extends App {
     if (!iter.hasNext) error("Character expected")
     if (iter.head == '\'') {
       iter.next
-      while (iter.hasNext && iter.head != '\'')
+      while (iter.hasNext && iter.head != '\'') {
+        if (iter.head == '\n') error("Newline in string")
         b.append(iter.next)
+      }
       if (iter.hasNext) iter.next
       else error("Closing ' expected")
     } else {
@@ -83,9 +90,15 @@ object convert extends App {
 
   def altFromSrc(src: String) = {
     val n1 = src.lastIndexOf("/")
-    val n2 = src.lastIndexOf(".")
-    if (n2 >= 0) src.substring(n1 + 1, n2) else src.substring(n1 + 1)
+    val filepart = src.substring(n1 + 1)
+    val n2 = filepart.lastIndexOf(".")
+    if (n2 >= 0) filepart.substring(n2) else filepart
   }
+
+  def contentFromHref(href: String) = 
+    if (href.startsWith("#")) null
+    else if (href.startsWith("http://") || href.startsWith("https://")) href
+    else href.substring(href.lastIndexOf("/") + 1)  
 
   if (args.length > 0 && args(0) == "-x") xmlMode = true;
   val stk = new java.util.Stack[String]
@@ -118,7 +131,8 @@ object convert extends App {
                     endOfComment = 0
                   }
                 } else { 
-                    print(iter.next)
+                  print(iter.head)
+                  if (iter.next == '\n') line += 1
                 }
               }
             }
@@ -179,7 +193,7 @@ object convert extends App {
             }
                   
           if (tagName == "") error("name or . expected after " + ch)
-          if (!xmlMode && !elements.contains(tagName) && !tagName.contains(":")) error (tagName + " is not a valid HTML element")
+          if (!xmlMode && !elements.contains(tagName) && !tagName.contains(":")) warning (tagName + " is not a valid HTML element")
           print("<")
           print(tagName)
           if (id != "")
@@ -207,7 +221,7 @@ object convert extends App {
 
                     if (attrName == "class" && klass != "") error("both ." + klass.replace(" ", ".") + " and class='" + attrValue + "'")
                     else if (attrName == "id" && id != "") error("both #" + id + " and id='" + attrValue + "'")
-                    else if (!xmlMode && attrName == "href" && !attrValue.startsWith("#") && tagName == "a" && iter.head == END) nonAttr = attrValue
+                    else if (!xmlMode && attrName == "href" && !attrValue.startsWith("#") && tagName == "a" && iter.head == END) nonAttr = contentFromHref(attrValue)
                     else if (!xmlMode && tagName == "img") {
                       if (attrName == "src") srcAttr = attrValue;
                       if (attrName == "alt") altAttr = attrValue;
@@ -236,7 +250,7 @@ object convert extends App {
           } else {
             stk.push(tagName)
             print(">")
-            if (nonAttr != null) print(nonAttr)
+            if (nonAttr != null) print(nonAttr) 
           }
         }
       }
@@ -252,6 +266,8 @@ object convert extends App {
     else if (ch == '&')
       print("&amp;")
     else {
+      if (Character.isWhitespace(ch) && !xmlMode && stk.contains("pre") && !" \n\r".contains(ch))
+        error("Invalid whitespace")
       print(ch)
       if (ch == '\n') line += 1
     }

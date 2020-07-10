@@ -86,7 +86,7 @@ object unconvert extends App {
         klass = "";
       } else {
         klass = klass.replace(" ", ".")
-        if (klass != "")
+        if (klass != "" || label == "span") // Need . for empty span
           print("." + klass)
       }
       var id = e.attributes.get("id").getOrElse(Text("")).text
