@@ -455,6 +455,7 @@
            (string-match "\.chx?$" buffer-file-name))
       (progn
         (setq cmd (concat ch-command " " (shell-quote-argument buffer-file-name)))
+        (message cmd)
         
         (setq output (shell-command-to-string cmd))
         (if (> (length (split-string output "\n")) 2)

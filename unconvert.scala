@@ -78,7 +78,8 @@ object unconvert extends App {
     if (!isInline) writeIndent(indent)
     val allNamespaces = namespaces(e)
     print("〈")
-    if (!(label == "code" && e.attributes.size == 0)) {
+    val isEmptyCodeLabel = label == "code" && e.attributes.size == 0
+    if (!isEmptyCodeLabel) {
       if (label != "span") print(label)
 
       var klass = e.attributes.get("class").getOrElse(Text("")).text
@@ -107,7 +108,7 @@ object unconvert extends App {
     }
     if (e.child.length > 0) {
       if (label == "pre" || label == "script") println() 
-      else if (e.child.text.matches("[^= ]+=([^ ]|'[^']*').*")) print("  ") 
+      else if (e.child.text.matches("[^= ]+=([^ ]|'[^']*').*") && !isEmptyCodeLabel) print("  ") 
       else print(" ")
     }
 

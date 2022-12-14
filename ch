@@ -1,7 +1,7 @@
 #!/bin/bash
 
 if [ -z $JAVA_HOME ] ; then
-  export JAVA_HOME=/opt/jdk1.8.0
+  export JAVA_HOME=/opt/jdk-11
 fi
 
 if [ -z $SCALA_HOME ] ; then
@@ -74,5 +74,16 @@ for IN in $@ ; do
 	fi
     fi
 
+    if [[ "$IN" = *".svg" ]] ; then
+	OUT=${IN/.svg/.ch}
+
+	if [ -z "$FORCE" ] && [ $OUT -nt $IN ]; then 
+            echo "$OUT is newer than $IN"
+	else
+            echo "$IN -> $OUT"
+            $SCALA_HOME/bin/scala -classpath $CLASSPATH unconvert < $IN > $OUT
+	fi
+    fi
+    
 done
 

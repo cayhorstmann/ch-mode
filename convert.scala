@@ -1,3 +1,9 @@
+/*
+
+TODO: Use https://github.com/mathjax/mathjax-node-cli/ to render AsciiMath, LaTeX. Use --semantics to add original code for recovery
+
+ */
+
 object convert extends App {
   val in = System.in
   val source = scala.io.Source.fromInputStream(in)
@@ -9,7 +15,7 @@ object convert extends App {
   val voidElements = Set("area", "base", "br", "col", "command", "embed", "hr", "img", "input", "keygen", "link", "meta", "param", "source", "track", "wbr") // http://dev.w3.org/html5/markup/syntax.html
 
   val elements = Set(
-"a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "data", "datalist", "dd", "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "menu", "menuitem", "meta", "meter", "nav", "nobr", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp",
+    "a", "abbr", "acronym", "address", "applet", "area", "article", "aside", "audio", "b", "base", "basefont", "bdi", "bdo", "bgsound", "big", "blink", "blockquote", "body", "br", "button", "canvas", "caption", "center", "cite", "code", "col", "colgroup", "command", "data", "datalist", "dd", "del", "details", "dfn", "dir", "div", "dl", "dt", "em", "embed", "fieldset", "figcaption", "figure", "font", "footer", "form", "frame", "frameset", "h1", "h2", "h3", "h4", "h5", "h6", "head", "header", "hgroup", "hr", "html", "i", "iframe", "img", "input", "ins", "isindex", "kbd", "keygen", "label", "legend", "li", "link", "listing", "main", "map", "mark", "marquee", "menu", "menuitem", "meta", "meter", "nav", "nobr", "noframes", "noscript", "object", "ol", "optgroup", "option", "output", "p", "param", "plaintext", "pre", "progress", "q", "rp", "rt", "ruby", "s", "samp", "script", "section", "select", "small", "source", "spacer", "span", "strike", "strong", "style", "sub", "summary", "sup", "table", "tbody", "td", "textarea", "tfoot", "th", "thead", "time", "title", "tr", "track", "tt", "u", "ul", "var", "video", "wbr", "xmp",
   "math", "mi", "mo", "mn", "mrow", "mtable", "mtr", "mtd", "mfrac", "msup", "maction", "menclose", "mfenced", "mglyph", "mover", "mroot", "ms", "msqrt", "msub", "msubsup", "mtable", "mtext", "munder", "mover", "munderover", "mstyle",
   "svg", "animate", "animateMotion", "animateTransform", "circle", "clipPath", "color-profile", "defs", "desc", "discard", "ellipse", "feBlend", "feColorMatrix", "feComponentTransfer", "feComposite", "feConvolveMatrix", "feDiffuseLighting", "feDisplacementMap", "feDistantLight", "feDropShadow", "feFlood", "feFuncA", "feFuncB", "feFuncG", "feFuncR", "feGaussianBlur", "feImage", "feMerge", "feMergeNode", "feMorphology", "feOffset", "fePointLight", "feSpecularLighting", "feSpotLight", "feTile", "feTurbulence", "filter", "foreignObject", "g", "hatch", "hatchpath", "image", "line", "linearGradient", "marker", "mask", "mesh", "meshgradient", "meshpatch", "meshrow", "metadata", "mpath", "path", "pattern", "polygon", "polyline", "radialGradient", "rect", "set", "solidcolor", "stop", "style", "switch", "symbol", "text", "textPath", "title", "tspan", "unknown", "use", "view"
   )
@@ -202,6 +208,7 @@ object convert extends App {
             print(" class='" + escapeAttribute(klass) + "'")
           var srcAttr: String = null
           var altAttr: String = null
+          var loadingAttr: String = null
           while (nonAttr == null && iter.hasNext && iter.head == ' ') {
             iter.next
             if (iter.hasNext && iter.head == ' ') {
@@ -215,7 +222,7 @@ object convert extends App {
               else {
                 if (iter.hasNext && iter.head == '=') {
                   iter.next
-                  if (iter.hasNext && !java.lang.Character.isWhitespace(iter.head)) {
+                  if (iter.hasNext && iter.head != END && !java.lang.Character.isWhitespace(iter.head)) {
                     val attrValue = stringLiteral(iter)
                     print(" " + attrName + "='" + escapeAttribute(attrValue) + "'")
 
@@ -225,6 +232,7 @@ object convert extends App {
                     else if (!xmlMode && tagName == "img") {
                       if (attrName == "src") srcAttr = attrValue;
                       if (attrName == "alt") altAttr = attrValue;
+                      if (attrName == "loading") loadingAttr = attrValue;
                     }
                   } else
                     nonAttr = attrName + "="
@@ -237,7 +245,8 @@ object convert extends App {
           if (iter.head == END) {
             if (!xmlMode && tagName == "img") {
               if (srcAttr == null) error("img without src")
-              else if (altAttr == null) print(" alt='" + escapeAttribute(altFromSrc(srcAttr)) + "'")              
+              if (altAttr == null) print(" alt='" + escapeAttribute(altFromSrc(srcAttr)) + "'")
+              if (loadingAttr == null) print(" loading='lazy'") // https://web.dev/browser-level-image-lazy-loading/
             }
             if ((nonAttr == null || nonAttr.trim().equals("")) && (xmlMode || voidElements.contains(tagName)))
               print("/>")
