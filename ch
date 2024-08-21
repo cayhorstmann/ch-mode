@@ -4,11 +4,7 @@ if [ -z $JAVA_HOME ] ; then
   export JAVA_HOME=/opt/jdk-11
 fi
 
-if [ -z $SCALA_HOME ] ; then
-  export SCALA_HOME=/opt/scala
-fi
-
-CLASSPATH=`readlink -f $0`.jar # ch.jar
+CLASSPATH=`readlink -f $0`/../target/scala-2.12/ch-assembly-1.0-SNAPSHOT.jar
 
 if [[ "$1" = "-f" ]] ; then
     FORCE=t
@@ -28,7 +24,7 @@ for IN in $@ ; do
 	else
 	    if [[  $# -gt 1 ]] ; then echo $IN ; fi
             echo "$IN -> $OUT"
-            $SCALA_HOME/bin/scala -classpath $CLASSPATH convert < $IN > $OUT
+            java -classpath $CLASSPATH convert < $IN > $OUT
 	fi
     fi
 
@@ -39,7 +35,7 @@ for IN in $@ ; do
 	else
 	    if [[  $# -gt 1 ]] ; then echo $IN ; fi
             echo "$IN -> $OUT"
-            $SCALA_HOME/bin/scala -classpath $CLASSPATH convert -x< $IN > $OUT
+            java -classpath $CLASSPATH convert -x < $IN > $OUT
 	fi
     fi
 
@@ -50,7 +46,7 @@ for IN in $@ ; do
             echo "$OUT is newer than $IN"
 	else
             echo "$IN -> $OUT"
-            $SCALA_HOME/bin/scala -classpath $CLASSPATH unconvert < $IN > $OUT
+            java -classpath $CLASSPATH unconvert < $IN > $OUT
 	fi
     fi
 
@@ -60,7 +56,7 @@ for IN in $@ ; do
             echo "$OUT is newer than $IN"
 	else
             echo "$IN -> $OUT"
-            $SCALA_HOME/bin/scala -classpath $CLASSPATH unconvert < $IN > $OUT
+            java -classpath $CLASSPATH unconvert < $IN > $OUT
 	fi
     fi
 
@@ -70,7 +66,7 @@ for IN in $@ ; do
             echo "$OUT is newer than $IN"
 	else
             echo "$IN -> $OUT"
-            $SCALA_HOME/bin/scala -classpath $CLASSPATH unconvert < $IN > $OUT
+            java -classpath $CLASSPATH unconvert < $IN > $OUT
 	fi
     fi
 
@@ -81,7 +77,7 @@ for IN in $@ ; do
             echo "$OUT is newer than $IN"
 	else
             echo "$IN -> $OUT"
-            $SCALA_HOME/bin/scala -classpath $CLASSPATH unconvert < $IN > $OUT
+            java -classpath $CLASSPATH unconvert < $IN > $OUT
 	fi
     fi
     

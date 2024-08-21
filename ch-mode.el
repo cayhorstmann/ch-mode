@@ -24,17 +24,13 @@
 ;; (add-to-list 'load-path (expand-file-name "/path/to/ch-mode"))
 ;; (load "ch-mode")
 
-;; You need Scala version 2.10 or later, which needs Java 7 or later.
-;; Make a JAR file by running
-;;     scalac *.scala
-;;     jar cvf ch.jar *.class
-;;     rm *.class
-
-;; Then move the ch script and ch.jar to ~/bin or another location
-;; of your choice. If you don't have JAVA_HOME and SCALA_HOME set,
-;; edit the ch script to set them.
+;; Install sbt (https://www.scala-sbt.org/) and run
+;;     sbt assembly
+;; This makes a JAR file target/scala-2.12/ch-assembly-1.0-SNAPSHOT.jar
+;; that is invoked from the ch shell script
 
 ;; Set the path to the ch command in the ch group (default ~/bin/ch)
+;; If you move the script to your ~/bin, also move the JAR file.
 
 ;; You can change the font faces in the ch-faces group
 
@@ -86,9 +82,13 @@
   "Face name to use for h3.")
 (defvar ch-h4-face 'ch-h4-face
   "Face name to use for h4.")
+(defvar ch-tag-face 'ch-tag-face
+  "Face name to use for tags.")
+(defvar ch-attribute-face 'ch-attribute-face
+  "Face name to use for attributes.")
 
 (defface ch-code-face 
-  '((t (:family "fixed"))) 
+  '((t (:family "monospace"))) 
   "ch code face" :group 'ch-faces)
 (defface ch-strong-face 
   '((t (:weight bold))) 
@@ -97,17 +97,24 @@
   '((t (:slant italic))) 
   "ch em face" :group 'ch-faces)
 (defface ch-h1-face 
-  '((t (:weight bold :height 1.4))) 
+  '((t (:family "sans" :weight bold :height 1.4))) 
   "ch h1 face" :group 'ch-faces)
 (defface ch-h2-face 
-  '((t (:weight bold :height 1.25))) 
+  '((t (:family "sans" :weight bold :height 1.25))) 
   "ch h2 face" :group 'ch-faces)
 (defface ch-h3-face 
-  '((t (:weight bold :height 1.15))) 
+  '((t (:family "sans" :weight bold :height 1.15))) 
   "ch h3 face" :group 'ch-faces)
 (defface ch-h4-face 
-  '((t (:weight bold :height 1.08))) 
+  '((t (:family "sans" :weight bold :height 1.08))) 
   "ch h4 face" :group 'ch-faces)
+(defface ch-tag-face 
+  '((t (:family "monospace" :foreground "sea green")))
+  "ch tag face" :group 'ch-faces)
+(defface ch-attribute-face 
+  '((t (:family "monospace" :foreground "light sea green")))
+  "ch attribute face" :group 'ch-faces)
+
 
 (defvar ch-font-lock-defaults nil "Value for font-lock-defaults.")
 
@@ -176,8 +183,8 @@
         ("〈\\(strong\\|b\\) \\([^〉]+\\)〉" . (2 ch-strong-face))
         ("〈\\(em\\|i\\|var\\) \\([^〉]+\\)〉" . (2 ch-em-face))
         ("〈 \\([^〉]+\\)〉" . (1 ch-code-face))
-        ("〈\\([.a-zA-Z0-9:#_-]+\\)" . (1 font-lock-builtin-face))
-        ("〈[.a-zA-Z0-9:#_-]+\\(\\( [a-zA-Z0-9:#_-]+=\\('[^']*'\\|[^ 〉]+\\)\\)*\\)" . (1 font-lock-type-face))
+        ("〈\\([.a-zA-Z0-9:#_-]+\\)" . (1 ch-tag-face))
+        ("〈[.a-zA-Z0-9:#_-]+\\(\\( [a-zA-Z0-9:#_-]+=\\('[^']*'\\|[^ 〉]+\\)\\)*\\)" . (1 ch-attribute-face))
         ))
 
 ;; TODO: Factor out common code
@@ -344,7 +351,7 @@
     (setq pos (point))
     (forward-char 1)
     (newline-and-indent)
-    (insert "〈li 〉")    
+    (insert "  〈li 〉")    
     (newline-and-indent)
     (insert "〈li 〉")    
     (indent-for-tab-command)
